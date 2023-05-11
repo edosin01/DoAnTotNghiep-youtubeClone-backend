@@ -253,7 +253,7 @@ exports.recommendedVideos = asyncHandler(async (req, res, next) => {
 
 exports.recommendChannels = asyncHandler(async (req, res, next) => {
   const channels = await User.findAll({
-		limit: 10,
+    limit: 10,
     attributes: ["id", "username", "avatar", "channelDescription"],
     where: {
       id: {
@@ -300,7 +300,7 @@ exports.getHistory = asyncHandler(async (req, res, next) => {
 const getVideos = async (model, req, res, next) => {
   const videoRelations = await model.findAll({
     where: { userId: req.user.id },
-    order: [["createdAt", "ASC"]],
+    order: model === View ? [["updatedAt", "DESC"]] : [["createdAt", "ASC"]],
   });
 
   const videoIds = videoRelations.map((videoRelation) => videoRelation.videoId);
@@ -321,12 +321,15 @@ const getVideos = async (model, req, res, next) => {
   if (!videos.length) {
     return res.status(200).json({ success: true, data: videos });
   }
+  const videoSorted = videos.sort(function (a, b) {
+    return videoIds.indexOf(a.id) - videoIds.indexOf(b.id);
+  });
 
-  videos.forEach(async (video, index) => {
+  videoSorted.forEach(async (video, index) => {
     const views = await View.count({ where: { videoId: video.id } });
     video.setDataValue("views", views);
 
-    if (index === videos.length - 1) {
+    if (index === videoSorted.length - 1) {
       return res.status(200).json({ success: true, data: videos });
     }
   });

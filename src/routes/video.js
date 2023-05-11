@@ -11,6 +11,7 @@ const {
   addComment,
   newView,
   searchVideo,
+  updateView,
 } = require("../controllers/video");
 
 router.route("/").post(protect, newVideo);
@@ -21,5 +22,6 @@ router.route("/:id/like").get(protect, likeVideo);
 router.route("/:id/dislike").get(protect, dislikeVideo);
 router.route("/:id/comment").post(protect, addComment);
 router.route("/:id/view").get(protect, newView);
+router.route("/:id/view").put(protect, updateView);
 
 module.exports = router;

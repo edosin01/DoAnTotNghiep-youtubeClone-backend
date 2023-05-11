@@ -266,6 +266,35 @@ exports.newView = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: {} });
 });
 
+exports.updateView = asyncHandler(async (req, res, next) => {
+  const video = await Video.findByPk(req.params.id);
+
+  if (!video) {
+    return next({
+      message: `No video found for ID - ${req.params.id}`,
+      statusCode: 404,
+    });
+  }
+
+  const viewed = await View.findOne({
+    where: {
+      userId: req.user.id,
+      videoId: req.params.id,
+    },
+  });
+
+  if (viewed) {
+    await View.update(req.body, {
+      where: { id: req.user.id },
+    });
+    res.status(200).json({ success: true, data: {} });
+  }
+
+  await View.update(req.body, {
+    where: { id: viewed.id },
+  });
+});
+
 exports.searchVideo = asyncHandler(async (req, res, next) => {
   if (!req.query.searchterm) {
     return next({ message: "Please enter the searchterm", statusCode: 400 });
