@@ -236,6 +236,7 @@ exports.recommendedVideos = asyncHandler(async (req, res, next) => {
     ],
     include: [{ model: User, attributes: ["id", "avatar", "username"] }],
     order: [["createdAt", "DESC"]],
+    limit: 10,
   });
 
   if (!videos.length)
